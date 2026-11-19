@@ -1,1 +1,114 @@
-{"columns":9,"orbits":true,"planet":true,"motherShipAxial":true,"armorAndMecha":true,"gateLocked":true,"viewport390":true,"exceptions":[]}
+{
+  "scene": "synthetic preview (outputs/星海导航-预览.html), not real SillyTavern",
+  "browser": "Chrome headless, CDP",
+  "runs": {
+    "desktop": {
+      "viewport": {
+        "width": 1600,
+        "height": 1000,
+        "mobile": false
+      },
+      "pages": [
+        "01-星图",
+        "02-星图-选中",
+        "03-恒星系",
+        "04-行星",
+        "05-外交",
+        "06-舰船设计",
+        "07-舰队",
+        "08-斗铠",
+        "09-机甲",
+        "10-机甲-切换",
+        "11-图鉴",
+        "12-科技",
+        "13-养成",
+        "14-内政",
+        "15-L星门",
+        "16-灰风"
+      ],
+      "contentOverflowX": 0,
+      "unnamedButtons": 0,
+      "fontsNotLoaded": [],
+      "offscreenControls": {},
+      "consoleErrors": [],
+      "ignored": [
+        "log error: Failed to load resource: the server responded with a status of 404 (File not found) http://localhost:4808/favicon.ico"
+      ]
+    },
+    "narrow": {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "mobile": true
+      },
+      "pages": [
+        "01-星图",
+        "02-星图-选中",
+        "03-恒星系",
+        "04-行星",
+        "05-外交",
+        "06-舰船设计",
+        "07-舰队",
+        "08-斗铠",
+        "09-机甲",
+        "10-机甲-切换",
+        "11-图鉴",
+        "12-科技",
+        "13-养成",
+        "14-内政",
+        "15-L星门",
+        "16-灰风"
+      ],
+      "contentOverflowX": 0,
+      "unnamedButtons": 0,
+      "fontsNotLoaded": [],
+      "offscreenControls": {
+        "06-舰船设计": [
+          "选择船体 云海级载舰船体",
+          "选择船体 苍穹级母舰舰体"
+        ]
+      },
+      "consoleErrors": [],
+      "ignored": [
+        "log error: Failed to load resource: the server responded with a status of 404 (File not found) http://localhost:4808/favicon.ico"
+      ]
+    },
+    "reduced": {
+      "viewport": {
+        "width": 1600,
+        "height": 1000,
+        "mobile": false
+      },
+      "pages": [
+        "01-星图",
+        "02-星图-选中",
+        "03-恒星系",
+        "04-行星",
+        "05-外交",
+        "06-舰船设计",
+        "07-舰队",
+        "08-斗铠",
+        "09-机甲",
+        "10-机甲-切换",
+        "11-图鉴",
+        "12-科技",
+        "13-养成",
+        "14-内政",
+        "15-L星门",
+        "16-灰风"
+      ],
+      "contentOverflowX": 0,
+      "unnamedButtons": 0,
+      "fontsNotLoaded": [],
+      "offscreenControls": {},
+      "consoleErrors": [],
+      "ignored": [
+        "log error: Failed to load resource: the server responded with a status of 404 (File not found) http://localhost:4808/favicon.ico"
+      ]
+    }
+  },
+  "notes": [
+    "offscreenControls on 06-舰船设计 at 390px are hull cards inside the horizontally scrolling hull gallery",
+    "favicon.ico 404 comes from the static preview server, not the mod"
+  ]
+}

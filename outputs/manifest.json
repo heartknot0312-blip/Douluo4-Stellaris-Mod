@@ -24,11 +24,11 @@
   "artifacts": [
     {
       "path": "dl4-space-backend.js",
-      "sha256": "84b0da174c0e82552ed1ed309f8706a9afe4bab102852fceb07a0789143964ae"
+      "sha256": "b18efe596e78ba14b8abed04582a9bd97656ae6f1e0caba722e3643c17bf17a8"
     },
     {
       "path": "dl4-space-backend.helper.json",
-      "sha256": "691f0f259397e54dc715bde3d85782d4a81bd2ec85a1cf5f38e3f0cade6d51f3"
+      "sha256": "d8f50e7f99a6ef5390e40531941545d2fdb7413a6f2415bb5a85fbc663cb9a41"
     },
     {
       "path": "dl4-space-rules.worldbook.json",
@@ -43,35 +43,35 @@
       "sha256": "b07a25c19de980a2093f6c844880a21f837a0d7a196b4d1137fb38cd02122460"
     },
     {
-      "path": "斗四星际MOD-v8-一键安装.script.json",
-      "sha256": "40d7b7ffb6e6cd33fa98fbe8e321a5166f4387ee4df07fda3e58b889555bffee"
+      "path": "斗四星际MOD-v9-一键安装.script.json",
+      "sha256": "c3386d6c96103ae869732fe815675d73bf67d2b5539d6f4f3d45b7d8dc780cc2"
     },
     {
       "path": "斗四星际MOD-一键安装.script.json",
-      "sha256": "40d7b7ffb6e6cd33fa98fbe8e321a5166f4387ee4df07fda3e58b889555bffee"
+      "sha256": "c3386d6c96103ae869732fe815675d73bf67d2b5539d6f4f3d45b7d8dc780cc2"
     },
     {
       "path": "斗四星际MOD-工坊作品包.json",
-      "sha256": "875ac337eb7b7bad1631bbc49cc6a7e0810b59a4be0b0b4b0f4eea1acb2b739e"
+      "sha256": "b81d1ad6bd57a66901712021aa1e75652bd80c73886d9dc2217561d8255f8a4d"
     },
     {
       "path": "斗四星际MOD-工坊上传.json",
-      "sha256": "575e90bee47cc2007c721d876413b137fff50134febf4b3aaa7d8ec79da05883"
+      "sha256": "3c6d4cfa2baf4985d78a011ce8d988be21bfb2a9f34df6f4ebcdd0d8b4b2c0f2"
     },
     {
       "path": "星海导航-预览.html",
-      "sha256": "c1c112957f1daf13bac50a3a4e82836862a472d9d8161b043aa325a950eb7b58"
+      "sha256": "fbb210fb65f64b9423e843d7f7abaec9afef3d9c850bc00174a79baa2f133c45"
     },
     {
       "path": "前端预览证据.json",
-      "sha256": "5ffe2e8d5f6659f3a545cdcf19df580540dde48e17c83f012ca9b17ddd275c2b"
+      "sha256": "79667c504fc038d27f3955d6c82153697ecd4a727feaeb07e55fc4f97d8d56ea"
     },
     {
-      "path": "星海导航-v8-预览.html",
-      "sha256": "c1c112957f1daf13bac50a3a4e82836862a472d9d8161b043aa325a950eb7b58"
+      "path": "星海导航-v9-预览.html",
+      "sha256": "fbb210fb65f64b9423e843d7f7abaec9afef3d9c850bc00174a79baa2f133c45"
     }
   ],
   "runtimeAcceptance": "pending",
-  "frontendVersion": "8.0.0",
-  "workshopVersion": 8
+  "frontendVersion": "9.0.0",
+  "workshopVersion": 9
 }

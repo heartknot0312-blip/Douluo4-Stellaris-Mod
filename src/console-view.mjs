@@ -1,7 +1,8 @@
 // Each cartographic cell is clipped against its neighbours. Uncharted space stays open.
-export function territoryShape(system, systems, pos) {
-  const c=pos(system.id), radius=154;
-  let pts=Array.from({length:18},(_,i)=>{const a=i*Math.PI/9;return [c.x+radius*Math.cos(a),c.y+radius*Math.sin(a)];});
+// 领地单元：先画一圈带轻微起伏的有机椭圆，再按与相邻星系的中垂线裁切（Voronoi 式），同势力单元由星图合并描边。
+export function territoryShape(system, systems, pos, radius=118) {
+  const c=pos(system.id), seed=[...String(system.id)].reduce((n,ch)=>(n*31+ch.charCodeAt(0))>>>0,7), k1=1+seed%3, k2=3+seed%4, ph=(seed%628)/100;
+  let pts=Array.from({length:56},(_,i)=>{const a=i*Math.PI*2/56, r=radius*(1+.07*Math.sin(a*k1+ph)+.04*Math.sin(a*k2-ph*1.7));return [c.x+r*Math.cos(a),c.y+r*.86*Math.sin(a)];});
   for(const other of systems){
     if(other.id===system.id)continue;
     const n=pos(other.id), dx=n.x-c.x,dy=n.y-c.y, mid=(n.x*n.x+n.y*n.y-c.x*c.x-c.y*c.y)/2;
@@ -16,27 +17,38 @@ export function territoryShape(system, systems, pos) {
   return pts;
 }
 
+// 恒星系轨道盘：正投影倾斜的椭圆轨道，行星按固定相位落位（不移动，便于点选）；卫星绕所属行星，设施/舰船/生态信号贴近所属天体或外环。
+const ORBIT_TINT=[[/海洋|海/,'#6fb7e8'],[/冰/,'#cfe8f2'],[/熔岩|熔|沙漠/,'#e8945a'],[/气态/,'#d9b27a'],[/岩石|荒芜/,'#a99b86']];
 export function orbitalChart(doc, s, tables, select){
-  const names=new Map([['Sun',{...s,kind:'恒星'}]]), lines=['schema 2.5','system Sector','object star Sun','  class G2','  color #ffda87'];
-  const planets=new Map(), rows=table=>Object.values(tables[table]||{}).filter(r=>r.systemId===s.id);
-  function add(row,type,body){
-    const id='B'+names.size;names.set(id,row);lines.push('object '+type+' '+id,...body.map(l=>'  '+l));return id;
-  }
-  rows('planets').forEach((p,i)=>planets.set(p.id,add({...p,table:'planets'},'planet',['orbit Sun','semiMajor '+(.55+i*.85)+'au','phase '+((i*137+28)%360)+'deg','inclination 19deg','radius 1re','color '+(/海/.test(p.planetType)?'#61c7ff':/熔/.test(p.planetType)?'#ef925c':'#a3bdc2')])));
-  const locals=[...rows('orbitals'),...rows('places'),...rows('ships').filter(x=>!['入库','收束','摧毁'].includes(x.status)), ...rows('creatures')];
-  locals.forEach((p,i)=>{
-    const parent=planets.get(p.planetId),phase='phase '+((i*111+97)%360)+'deg';
-    if(p.kind==='卫星'&&parent)add(p,'moon',['orbit '+parent,'distance '+(p.orbitRadius||220000)+'km',phase,'radius 0.25re']);
-    else add(p,tables.creatures?.[p.id]?'phenomenon':'structure',['kind '+(tables.creatures?.[p.id]?'anomaly':'relay'),'orbit '+(parent||'Sun'),parent?'distance '+(p.orbitRadius||290000+i*45000)+'km':'semiMajor '+(.8+.39*i)+'au',phase]);
+  const NS='http://www.w3.org/2000/svg',sv=(tag,attrs={},...kids)=>{const n=doc.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));for(const c of kids)if(c)n.append(c);return n;};
+  const rows=table=>Object.values(tables[table]||{}).filter(r=>r.systemId===s.id),cx=450,cy=215,tilt=.34;
+  const svg=sv('svg',{class:'system-orbits',viewBox:'0 0 900 430',role:'group','aria-label':s.name+'轨道图'});
+  const label=(x,y,text,cls)=>{const t=sv('text',{x,y,'text-anchor':'middle',class:cls});t.textContent=text;return t;};
+  const hit=(g,item)=>{g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',item.name+(item.kind?'，'+item.kind:''));g.addEventListener('click',()=>select(item));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(item);}});};
+  const deco=sv('g',{'aria-hidden':'true'});svg.append(deco);
+  for(const r of [130,250,370])deco.append(sv('ellipse',{cx,cy,rx:r+40,ry:(r+40)*tilt,fill:'none',stroke:'#d8b46a','stroke-width':.4,opacity:.12}));
+  deco.append(sv('path',{d:`M${cx-430} ${cy}H${cx+430}M${cx} 18V412`,stroke:'#d8b46a','stroke-width':.4,'stroke-dasharray':'2 6',opacity:.25}));
+  const planets=rows('planets'),n=planets.length,inner=n>4?95:n>2?120:160,step=n>1?Math.min(95,(415-inner)/(n-1)):0,where=new Map(),orbits=sv('g',{class:'orb-paths','aria-hidden':'true'}),layer=sv('g');svg.append(orbits,layer);
+  // 恒星
+  const star=sv('g',{class:'orb-star'},sv('circle',{cx,cy,r:46,fill:'#ffda87',opacity:.08}),sv('circle',{cx,cy,r:30,fill:'#ffda87',opacity:.14,class:'pulse'}),sv('circle',{cx,cy,r:15,fill:'#fff0c6'}),
+    sv('path',{d:`M${cx} ${cy-34}L${cx+3} ${cy-3}L${cx+34} ${cy}L${cx+3} ${cy+3}L${cx} ${cy+34}L${cx-3} ${cy+3}L${cx-34} ${cy}L${cx-3} ${cy-3}Z`,fill:'#fff6dc',opacity:.85}),label(cx,cy+56,s.name,'orb-name'));
+  hit(star,{...s,kind:'恒星'});layer.append(star);
+  planets.forEach((p,i)=>{
+    const rx=inner+i*step,ry=rx*tilt,a=((i*137+28)%360)*Math.PI/180,x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry,tint=(ORBIT_TINT.find(([re])=>re.test(p.planetType||''))||[0,'#8fdc7a'])[1],size=p.habitability==='盖亚'?11:8.5;
+    orbits.append(sv('ellipse',{cx,cy,rx,ry,fill:'none',stroke:'#d8b46a','stroke-width':1,opacity:.45,class:'orb-path'}));where.set(p.id,{x,y});
+    const g=sv('g',{class:'orb-obj orb-planet'},sv('circle',{cx:x,cy:y,r:size+9,class:'orb-ring',fill:'none',stroke:'#f6dea2','stroke-width':1,'stroke-dasharray':'3 3'}),sv('circle',{cx:x,cy:y,r:size+4,fill:tint,opacity:.18}),sv('circle',{cx:x,cy:y,r:size,fill:tint,stroke:'#07060b','stroke-width':1.2}),sv('path',{d:`M${x-size*.7} ${y-size*.2}A${size} ${size*.42} 0 0 0 ${x+size*.7} ${y-size*.2}`,fill:'none',stroke:'#fff',opacity:.35}),label(x,y+size+17,p.name,'orb-name'));
+    hit(g,{...p,table:'planets'});layer.append(g);
   });
-  const loaded=WorldOrbit.loadWorldOrbitSource(lines.join('\n'));
-  if(!loaded.document)throw Error('轨道记录无法解析');
-  const scene=WorldOrbit.renderDocumentToScene(loaded.document,{width:900,height:430,projection:'orthographic',theme:'nightglass',preset:'atlas-card'});
-  const xml=new doc.defaultView.DOMParser().parseFromString(WorldOrbit.renderSceneToSvg(scene),'image/svg+xml'),svg=doc.importNode(xml.documentElement,true);
-  svg.setAttribute('class','system-orbits');svg.setAttribute('aria-label',s.name+'轨道图');svg.removeAttribute('width');svg.removeAttribute('height');
-  for(const t of svg.querySelectorAll('.wo-subtitle,.wo-meta,.wo-title,.wo-label-secondary'))t.remove();
-  for(const t of svg.querySelectorAll('text')){const item=names.get(t.textContent.trim());if(item)t.textContent=item.name;}
-  for(const g of svg.querySelectorAll('.wo-object[data-object-id],.wo-label[data-object-id]')){const item=names.get(g.getAttribute('data-object-id'));if(!item)continue;g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',item.name);g.addEventListener('click',()=>select(item));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(item);}});}
+  const extra=[...rows('orbitals'),...rows('places'),...rows('ships').filter(x=>!['入库','收束','摧毁'].includes(x.status)),...rows('creatures')],near=new Map();
+  extra.forEach((o,i)=>{
+    const host=where.get(o.planetId),k=near.get(o.planetId||'')||0;near.set(o.planetId||'',k+1);
+    let x,y;if(host){const a=-Math.PI/2+k*1.25;x=host.x+Math.cos(a)*30;y=host.y+Math.sin(a)*22;orbits.append(sv('line',{x1:host.x,y1:host.y,x2:x,y2:y,stroke:'#d8b46a','stroke-width':.6,opacity:.4}));}
+    else{const rx=Math.min(430,inner+n*step+28+(k%2)*16),a=((k*71+200)%360)*Math.PI/180;x=cx+Math.cos(a)*rx;y=cy+Math.sin(a)*rx*tilt;}
+    const creature=!!tables.creatures?.[o.id],ship=!!tables.ships?.[o.id],moon=o.kind==='卫星',color=creature?'#ff7ad9':ship?'#f6dea2':moon?'#c3b79f':'#6fd3d9';
+    const mark=moon?sv('circle',{cx:x,cy:y,r:4,fill:color}):creature?sv('circle',{cx:x,cy:y,r:5,fill:'none',stroke:color,'stroke-width':1.4}):ship?sv('path',{d:`M${x} ${y-6}L${x+5} ${y+5}L${x} ${y+2}L${x-5} ${y+5}Z`,fill:color}):sv('rect',{x:x-4,y:y-4,width:8,height:8,transform:`rotate(45 ${x} ${y})`,fill:'none',stroke:color,'stroke-width':1.3});
+    const g=sv('g',{class:'orb-obj orb-minor'},sv('circle',{cx:x,cy:y,r:12,fill:'transparent'}),sv('circle',{cx:x,cy:y,r:10,class:'orb-ring',fill:'none',stroke:color,'stroke-width':.8}),mark,label(x,y-10,o.name,'orb-minor-name'));
+    hit(g,o);layer.append(g);
+  });
   return svg;
 }
 

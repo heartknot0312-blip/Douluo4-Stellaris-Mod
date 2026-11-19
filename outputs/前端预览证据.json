@@ -1,20 +1,16 @@
 {
   "sourceFiles": [
     {
-      "path": "src/vendor/worldorbit.js",
-      "sha256": "1da4b7749a22d74a458d37a6ce2ba09faef24c26eb656933a53e0e30b9f28060"
-    },
-    {
       "path": "src/command.mjs",
       "sha256": "b27080d3c73e9da29fee054e3b741dd1833913d0cfbb74104f732670862e72a0"
     },
     {
       "path": "src/console-view.mjs",
-      "sha256": "b3efd3f0de383562a0800b4a77b4d044bfdf97408de0c73d0f79832cb3b3ff2b"
+      "sha256": "d38e6a64b5c77a687b5113e9e6201d19bfb6d120380ababd78f196d30ee58fa3"
     },
     {
       "path": "src/flightdeck.mjs",
-      "sha256": "77041d30e195f52e1bcd981a8f405b718b6a79f8103b31671c61a6a35acf8d02"
+      "sha256": "3ad8dced904e365fb70a5547cf55f728e0fa3d03355834c4a4283acde0c56aea"
     },
     {
       "path": "src/desk-panels.mjs",
@@ -26,7 +22,7 @@
     },
     {
       "path": "src/hangar.generated.mjs",
-      "sha256": "747dae8f22ff04834ec75247887939c7a6c6b15bc539f13613073e25c512e450"
+      "sha256": "8f08af18754adbbda37c0da319bd65d01451fa734dad637ff10fa5b9de177e48"
     },
     {
       "path": "src/content.mjs",
@@ -46,15 +42,19 @@
     },
     {
       "path": "src/ui-model.mjs",
-      "sha256": "0c5888f51bd0858669650f2efdbbb49e252cc6655872faa3fd232d50f39f84bd"
+      "sha256": "60711438ee7bd8f3ca98e9115ed1a242169804b16d02de505dc4f5ec7c21fa32"
+    },
+    {
+      "path": "src/fonts.generated.mjs",
+      "sha256": "9c37ce18f8f24588db8199db44817dcf8f93c3697bb56037939ffbc30b51498b"
     },
     {
       "path": "src/atlas-style.generated.mjs",
-      "sha256": "bc723f05209ac4fc457e7a1a896fab0f503ef770afbc37347ba1530ee30a93b6"
+      "sha256": "aeca4b0f18193c7358a279790187f9b3f39e53dc0176a4cf0c620b7d18b7d6d7"
     },
     {
       "path": "src/atlas.mjs",
-      "sha256": "5eeec86e5c96359d98a11fd9aefabee27f66022845fd17623e365cb39add0132"
+      "sha256": "1f9004492250ecb4b38c1e64e5b339c0688790e711aaaa74015008f832e7a58e"
     }
   ],
   "syntheticScene": true,

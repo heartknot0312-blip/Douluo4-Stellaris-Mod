@@ -40,6 +40,28 @@ test('原工坊内核一次安装全部组件、登记原工坊记录并备份ZO
   s=inspect();assert.equal(s.scripts.length,1);assert.equal(s.scripts[0].content,original.content);assert.equal(s.regexes.length,0);assert.equal(s.bindings.additional.length,0);assert.equal(core.records().items.length,0);
 });
 test('上一版发行包v6可升级到v7，原脚本及单一世界书绑定可恢复',{skip:!exists||!fs.existsSync('outputs/斗四星际MOD-v6-一键安装.script.json')},async()=>{const {core,payload,inspect,original}=setup();const content=JSON.parse(fs.readFileSync('outputs/斗四星际MOD-v6-一键安装.script.json')).content;const start=content.indexOf('const DL4_PACKAGE = ');const end=content.indexOf(';\nconst localTv',start);assert(start>=0&&end>start);const v6=JSON.parse(content.slice(start+'const DL4_PACKAGE = '.length,end));assert.equal(v6.work.version,6);for(const pkg of [v6,payload]){const result=await core.importWork({payload:pkg,selected:pkg.parts.map(p=>p.id)});assert.equal(result.failed.length,0);assert.equal(result.problems.length,0);}assert.equal(inspect().scripts.filter(s=>s.name==='斗四星际后端').length,1);assert.equal(inspect().bindings.additional.length,1);await core.uninstall({workId:payload.work.id});assert.equal(inspect().scripts[0].content,original.content);});
+test('浅色 V8 可升级到魂环星盘，原工坊绑定及卸载备份可用', {skip:!exists}, async () => {
+  const {core,payload,inspect,original}=setup();
+  const installer=JSON.parse(fs.readFileSync('outputs/斗四星际MOD-v8-一键安装.script.json','utf8'));
+  const previous=JSON.parse(installer.content.match(/^const DL4_PACKAGE = (.+);$/m)[1]);
+  assert.equal(previous.work.version,8);
+  assert(previous.work.version<payload.work.version);
+  assert.equal(previous.work.id,payload.work.id);
+  for(const pkg of [previous,payload]){
+    const result=await core.importWork({payload:pkg,selected:pkg.parts.map(p=>p.id)});
+    assert.equal(result.failed.length,0);
+    assert.equal(result.problems.length,0);
+  }
+  assert.equal(core.records().items.length,1);
+  assert.equal(core.records().items[0].version,payload.work.version);
+  const backends=inspect().scripts.filter(s=>s.name==='斗四星际后端');
+  assert.equal(backends.length,1);
+  assert.equal(backends[0].content,payload.parts.find(p=>p.data.id===backends[0].id).data.content);
+  assert.equal(inspect().bindings.additional.length,1);
+  const removed=await core.uninstall({workId:payload.work.id});
+  assert.equal(removed.problems.length,0);
+  assert.equal(inspect().scripts[0].content,original.content);
+});
 test('工坊篡改哈希被拒绝，未改动任何原卡组件', {skip:!exists},async()=>{
   const {core,payload,inspect,original}=setup();payload.parts[0].data.content+='tampered';
   await assert.rejects(()=>core.importWork({payload,selected:payload.parts.map(p=>p.id)}),/校验码/);

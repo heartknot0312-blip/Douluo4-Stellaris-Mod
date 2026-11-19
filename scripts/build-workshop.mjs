@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import crypto from 'node:crypto';
 const out = 'outputs';
+const workshopVersion = 9;
 const source = fs.readFileSync('work/workshop/entry.js', 'utf8');
 const stop = source.indexOf('// entry/src/bridge.js');
 if (stop < 0) throw new Error('无法识别原卡工坊模块边界');
@@ -34,7 +35,7 @@ add('script', compat, 'replace', { key: original.id, alt: original.name, name: o
 add('script', backend);
 addEntry(gray);
 for(const row of Object.values(book.entries).slice(3))addEntry(row);
-const payload = { work: { id: 'dl4spacebackend01', title: '斗四星际战争与探索·星海导航', version: 8, author: { id: 'local', name: '本地制作' }, wbMode: 'separate', bookName: '斗四星际战争与探索' }, parts, images: {} };
+const payload = { work: { id: 'dl4spacebackend01', title: '斗四星际战争与探索·星海导航', version: workshopVersion, author: { id: 'local', name: '本地制作' }, wbMode: 'separate', bookName: '斗四星际战争与探索' }, parts, images: {} };
 fs.writeFileSync(`${out}/斗四星际MOD-工坊作品包.json`, JSON.stringify(payload, null, 2));
 // 工坊上传编辑器接受角色卡JSON并拆解其中的世界书、正则、脚本。仅含本作品组件，无原卡人物/剧情。
 const upload = { spec: 'chara_card_v2', spec_version: '2.0', data: { name: payload.work.title, description: '', personality: '', scenario: '', first_mes: '', mes_example: '', creator_notes: '仅供工坊上传编辑器提取部件，不是完整角色卡。ZOD为替换原版，其余为新添。', system_prompt: '', post_history_instructions: '', alternate_greetings: [], tags: ['斗四', '星际'], creator: '本地制作', character_version: '1.0.0', extensions: { tavern_helper: { scripts: [compat, backend], variables: {} }, regex_scripts: [regex] }, character_book: { name: payload.work.bookName, entries: Object.values(book.entries).map(e => ({ id: e.uid, keys: e.key,  secondary_keys: [], comment: e.comment, content: e.content, constant: e.constant, enabled: true, insertion_order: e.order, position: 'before_char', extensions: { position: 0, exclude_recursion: true, prevent_recursion: true } })) } } };
@@ -82,7 +83,7 @@ fs.writeFileSync(`${out}/斗四星际MOD-一键安装.script.json`, JSON.stringi
 fs.copyFileSync(`${out}/斗四星际MOD-一键安装.script.json`,`${out}/斗四星际MOD-v${payload.work.version}-一键安装.script.json`);
 fs.writeFileSync('work/workshop/modules.cjs', prefix + exported);
 fs.writeFileSync(`${out}/工坊包构建记录.json`, JSON.stringify({ packageId: payload.work.id, parts: parts.map(({data,...p})=>p), reusedWorkshopEntrySHA256: digest(source), runtimeRequestsToWorkshopSite: false, published: false, liveInstalled: false },null,2));
-const manifest=load('manifest.json');manifest.delivery='rolecard-workshop-components-with-embedded-ui';manifest.frontendVersion='8.0.0';manifest.workshopVersion=payload.work.version;
+const manifest=load('manifest.json');manifest.delivery='rolecard-workshop-components-with-embedded-ui';manifest.frontendVersion=`${workshopVersion}.0.0`;manifest.workshopVersion=workshopVersion;
 for(const name of [`斗四星际MOD-v${payload.work.version}-一键安装.script.json`,'斗四星际MOD-一键安装.script.json','斗四星际MOD-工坊作品包.json','斗四星际MOD-工坊上传.json'])manifest.artifacts.push({path:name,sha256:digest(fs.readFileSync(`${out}/${name}`))});
 fs.writeFileSync(`${out}/manifest.json`,JSON.stringify(manifest,null,2));
 console.log(JSON.stringify({parts:parts.length, installerBytes:Buffer.byteLength(installer.content), files:['斗四星际MOD-一键安装.script.json','斗四星际MOD-工坊作品包.json','斗四星际MOD-工坊上传.json']},null,2));

@@ -39,14 +39,17 @@ export const ICON_PATHS = {
   gray:'M19 3A9 9 0 1 0 21 17Q12 21 9 13T19 3ZM17 7H21M19 5V9', atlas:'M12 3 14 9 21 12 14 15 12 21 10 15 3 12 10 9Z', federation:'M12 2 21 6 19 16 12 22 5 16 3 6ZM12 6V17M7 9 12 6 17 9', longma:'M4 18 7 8 12 3 17 8 20 18 12 14ZM7 18 12 21 17 18', neutral:'M12 3 21 12 12 21 3 12ZM7 12H17M12 7V17', hostile:'M5 4 19 20M19 4 5 20M4 8 8 4M16 20 20 16', nomad:'M3 17 12 4 21 17 12 13ZM5 20H19', pirate:'M6 5 12 2 18 5 19 12 16 16H8L5 12ZM8 19 16 21M16 19 8 21M8 8H10M14 8H16', curator:'M3 5 11 4 12 6 13 4 21 5V19L13 18 12 20 11 18 3 19ZM12 7V17', trade:'M3 8 12 3 21 8V18L12 22 3 18ZM3 8 12 13 21 8M12 13V22', salvage:'M6 3 5 8 9 12 13 8 12 3M9 12 18 21 21 18 12 9', mercenary:'M12 2 20 5V13L12 22 4 13V5ZM8 9 16 15M16 9 8 15', culture:'M5 5Q12 0 19 5V14Q12 25 5 14ZM8 9H9M15 9H16M9 14Q12 17 15 14', ecology:'M20 3Q5 1 4 12T12 21Q23 18 20 3ZM6 18 17 7', route:'M4 18 9 5 16 17 21 6M2 18H6M7 5H11M14 17H18', beast:'M4 16Q1 10 5 8L9 10 12 3 15 10 19 8Q23 10 20 16L12 21ZM8 14H9M15 14H16', leviathan:'M2 12 5 6 10 8 12 2 14 8 19 6 22 12 18 20 12 17 6 20ZM8 12 10 13M14 13 16 12', planet:'M3 12A9 9 0 1 0 21 12A9 9 0 1 0 3 12M1 16 23 8', ship:'M12 2 19 17 15 16 12 22 9 16 5 17ZM9 12H15', armor:'M8 3H16L20 7 18 12 16 11V21H8V11L6 12 4 7ZM10 6H14', gaia:'M12 2 14 8 21 7 17 12 21 17 14 16 12 22 10 16 3 17 7 12 3 7 10 8Z', close:'M5 5 19 19M19 5 5 19', back:'M15 4 7 12 15 20', scan:'M3 8V3H8M16 3H21V8M21 16V21H16M8 21H3V16M5 12H19', clock:'M12 3A9 9 0 1 1 11.99 3M12 6V12L16 15', plus:'M12 4V20M4 12H20', check:'M4 12 9 18 20 5', help:'M8 7Q8 2 13 3T17 9L12 13V15M12 19H12.01'
 };
 export function atlasHash(text) {let n=0;for(const c of String(text))n=(Math.imul(n,31)+c.charCodeAt(0))>>>0;return n;}
+// 中立组织按业态区分色相，未归属星域用冷灰；颜色只作辅助，名称与排线另行区分。
+const NEUTRAL_TINT={商业:'#4fd6a8',学术:'#6fd3d9',打捞:'#c9a37a',佣兵:'#e28f6b',文化:'#e7a6d0',生态:'#8fdc7a',航路:'#7fd0ff'};
 export function factionOf(record, organizations={}) {
   const id=record?.controllerId || record?.organizationId;
-  if(id==='org_federation')return {key:'federation',name:'斗罗联邦',color:'#207caa'};
-  if(id==='org_longma')return {key:'longma',name:'龙马势力',color:'#8056ba'};
+  if(id==='org_federation')return {key:'federation',name:'斗罗联邦',color:'#79c3ff'};
+  if(id==='org_longma')return {key:'longma',name:'龙马势力',color:'#b691ff'};
   const o=organizations[id];
-  if(o?.kind==='游牧')return {key:'nomad',name:o.name,color:'#ba700d'};
-  if(o?.kind==='海盗')return {key:'pirate',name:o.name,color:'#c84c65'};
-  return {key:'neutral',name:o?.name||'中立 / 归属未明',color:'#23816d'};
+  if(o?.kind==='游牧')return {key:'nomad',name:o.name,color:'#f2a13a'};
+  if(o?.kind==='海盗')return {key:'pirate',name:o.name,color:'#ff5d72'};
+  if(!o)return {key:'neutral',name:'中立 / 归属未明',color:'#a9abb6'};
+  return {key:'neutral',name:o.name||'中立 / 归属未明',color:NEUTRAL_TINT[o.kind]||'#4fd6a8'};
 }
 export function atlasPosition(system, organizations) {
   const c=system?.coordinates||system?.details?.coordinates;if(c&&Number.isFinite(c.x)&&Number.isFinite(c.y))return {x:Math.max(90,Math.min(910,c.x)),y:Math.max(90,Math.min(550,c.y))};

@@ -6,7 +6,7 @@ import http from 'node:http';
 import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
 const root=fileURLToPath(new URL('../',import.meta.url));
-const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'douluo4-v8-preview-'));
+const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'douluo4-preview-'));
 let page;
 try {
   for(const dir of ['src','scripts','prompts','assets'])fs.cpSync(path.join(root,dir),path.join(tmp,dir),{recursive:true});

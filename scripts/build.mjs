@@ -15,12 +15,15 @@ const sha = b => crypto.createHash('sha256').update(b).digest('hex');
 const schemaText = '\n【完整字段合同】\n公共字段：' + JSON.stringify(COMMON) + '\n表字段：' + JSON.stringify(TABLES) + '\n类型：ref:表名为必填外键；ref?:可省略或null；refs:为外键数组；enum:为指定枚举；positive为大于0。';
 const instruction = read('prompts/protocol.md') + schemaText + '\n【按类型细化路线】\n' + JSON.stringify(GENERATION_ROUTES) + '\n【作者配置】\n' + JSON.stringify(CONFIG);
 fs.writeFileSync(path.join(root, 'src/instruction.generated.mjs'), `// 由 scripts/build.mjs 生成\nexport const INSTRUCTION = ${JSON.stringify(instruction)};\n`);
-fs.writeFileSync(path.join(root,'src/atlas-style.generated.mjs'),`// 由 scripts/build.mjs 生成\nexport const UI_CSS = ${JSON.stringify(read('src/atlas.css')+'\n'+read('src/command.css')+'\n'+read('src/flightdeck.css')+'\n'+read('src/pearl.css'))};\n`);
+fs.writeFileSync(path.join(root,'src/atlas-style.generated.mjs'),`// 由 scripts/build.mjs 生成\nexport const UI_CSS = ${JSON.stringify(read('src/atlas.css')+'\n'+read('src/flightdeck.css')+'\n'+read('src/command.css'))};\n`);
 
-const art=Array.from({length:12},(_,i)=>'data:image/jpeg;base64,'+fs.readFileSync(path.join(root,'assets/hangar',i+'.jpg')).toString('base64'));fs.writeFileSync(path.join(root,'src/hangar.generated.mjs'),'export const HANGAR_ART='+JSON.stringify(art)+';\n');
-const files = ['src/vendor/worldorbit.js', 'src/schema.mjs', 'src/command.mjs', 'src/console-view.mjs','src/flightdeck.mjs','src/desk-panels.mjs','src/survey-globe.mjs','src/hangar.generated.mjs', 'src/content.mjs', 'src/gray-content.mjs', 'src/gray-media.generated.mjs', 'src/l-gate.mjs', 'src/public-atlas.mjs','src/engine.mjs', 'src/host.mjs', 'src/instruction.generated.mjs', 'src/ui-model.mjs', 'src/atlas-style.generated.mjs', 'src/atlas.mjs', 'src/browser-entry.mjs'];
-const license='/* WorldOrbit 5.0.0\n'+read('src/vendor/WorldOrbit-LICENSE.md')+'\n*/\n';
-const bundle = license+'(() => {\n"use strict";\n' + files.map(p => read(p).replace(/^import .*;\s*$/gm, '').replace(/^export /gm, '')).join('\n') + '\n})();\n';
+const art=Array.from({length:12},(_,i)=>'data:image/webp;base64,'+fs.readFileSync(path.join(root,'assets/hangar',i+'.webp')).toString('base64'));
+// 界面字体：assets/fonts 下的 OFL 子集（scripts/subset-fonts.py 生成），运行时经宿主文档 FontFace 注册，不访问网络。
+const fontFiles=[['DL4 Serif',900,'dl4-serif-900.woff2'],['DL4 Serif',600,'dl4-serif-600.woff2'],['DL4 Latin',600,'dl4-latin-600.woff2'],['DL4 Latin SC',600,'dl4-latin-sc-600.woff2']];
+fs.writeFileSync(path.join(root,'src/fonts.generated.mjs'),'// 由 scripts/build.mjs 生成\nexport const UI_FONTS='+JSON.stringify(fontFiles.map(([family,weight,file])=>({family,weight,data:fs.readFileSync(path.join(root,'assets/fonts',file)).toString('base64')})))+';\n');
+fs.writeFileSync(path.join(root,'src/hangar.generated.mjs'),'export const HANGAR_ART='+JSON.stringify(art)+';\n');
+const files = ['src/schema.mjs', 'src/command.mjs', 'src/console-view.mjs','src/flightdeck.mjs','src/desk-panels.mjs','src/survey-globe.mjs','src/hangar.generated.mjs', 'src/content.mjs', 'src/gray-content.mjs', 'src/gray-media.generated.mjs', 'src/l-gate.mjs', 'src/public-atlas.mjs','src/engine.mjs', 'src/host.mjs', 'src/instruction.generated.mjs', 'src/ui-model.mjs', 'src/fonts.generated.mjs', 'src/atlas-style.generated.mjs', 'src/atlas.mjs', 'src/browser-entry.mjs'];
+const bundle = '(() => {\n"use strict";\n' + files.map(p => read(p).replace(/^import .*;\s*$/gm, '').replace(/^export /gm, '')).join('\n') + '\n})();\n';
 fs.writeFileSync(path.join(out, 'dl4-space-backend.js'), bundle);
 const helper = { type: 'script', enabled: true, name: '斗四星际后端', id: 'a8f9a915-a3d2-4a12-80ac-ce51ae468510', content: bundle,
   info: '星海导航悬浮窗、模块化设计、装备与图鉴，及角色卡内世界生成、规则校验、分支重放与舰船结算。宿主基线：ST1.19.0/酒馆助手4.11.3。须同时导入世界书规则并替换斗罗ZOD兼容组件；无额外模型或网络请求。', button: { enabled: false, buttons: [] }, data: {}, export_with: { data: true, button: true } };
